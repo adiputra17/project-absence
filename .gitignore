@@ -1,6 +1,10 @@
 .DS_Store
 
+<<<<<<< HEAD
 application/controllers/AbsenController.php
+=======
+application/controllers/*
+>>>>>>> 122204afcae99b712ca01e3d691c318dd2c79220
 
 application/cache/*
 !application/cache/index.html
