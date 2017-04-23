@@ -25,6 +25,13 @@ class AbsenController extends CI_Controller {
 		//redirect('AbsenController/index','refresh');
 	}
 
+	// Hapus Cabang / region
+	public function deleteRegion(){
+		$data = $_POST['data'];
+		$this->AbsenModel->deleteRegion($data);
+		//redirect('AbsenController/index','refresh');
+	}
+
 	// Tambah Titik
 	public function addPoint(){
 		$data = $_POST['data'];

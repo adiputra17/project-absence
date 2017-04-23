@@ -51,7 +51,7 @@
   		&nbsp&nbsp&nbsp
   		<div class="input-group">
   		<!-- <button type="submit" id="addAnggota" style="display: none;" class="btn btn-default">Tambah Anggota</button> -->
-  		<div class="input-group-addon">Tambah Anggota</div>
+  		<div class="input-group-addon" style="background: #5bc0de; color: #fff;">Tambah Anggota</div>
   		<input type="text" class="form-control" id="inputNamaAnggota" style="/*display: none;*/ width: 200px;" placeholder="Masukkan Nama">
   		<input type="text" class="form-control" id="inputAlamatAnggota" style="/*display: none;*/ width: 200px;" placeholder="Masukkan Alamat">
 
@@ -78,6 +78,7 @@
 </div>
 </div>
 
+<!-- tabel absen -->
 <table class="table-striped">
 	<tr>
 		<th style="padding: 5px;">No</th>
@@ -91,8 +92,8 @@
 		<?php $s = $this->db->query("SELECT * FROM person ORDER BY personID DESC LIMIT 1");
         foreach($s->result_array() as $row): ?>
 		<th style="padding: 5px;" colspan="<?php echo $rowAbsen/$rowPerson; ?>">Absen 
-		<button id="" class="btn btn-info btn-xs" title="Tambah data absen">
-			Tambah data absen <?php echo $rowAbsen."+".$rowPerson."+".$row['personID'] ;?>
+		<button data-toggle="modal" data-target="#addAbsenModal" class="btn btn-info btn-xs" title="Tambah data absen">
+			Tambah data absen <?php echo $rowAbsen."/".$rowPerson."->".$row['personID'] ;?>
 		</button>
 		</th>
 		<?php endforeach; ?>
@@ -114,16 +115,35 @@
 		<!-- Keaktifan -->
 		<?php
 			$this->db->where('personID', $r['personID']);
-			$bind = array('H', '-');
+			$bind = array('H');
 			$this->db->where_in('absenSTATUS', $bind);
 			$active = $this->db->get('absen');
+
+			$this->db->where('personID', $r['personID']);
+			$this->db->where('absenSTATUS', '-');
+			$baru = $this->db->get('absen');
+
 			$all = $this->db->count_all_results('absen');
 			$col = $this->db->count_all_results('person');
 			$fullactive = $all/$col;
+			$fullactive -= $baru->num_rows();
+			if($fullactive == 0){
+				$fullactive = 1;
+			}
 		?>
-		<td width="60px" style="border:0px solid #000; padding: 5px;">
-			<?php echo round($active->num_rows()/$fullactive*100); ?>%
-		</td>
+		<?php
+			if(($active->num_rows()/$fullactive*100)>=75){ ?>
+				<td width="60px" style="border:0px solid #000; padding: 5px; background-color: #3DD94A; color: #fff">
+					<?php echo round($active->num_rows()/$fullactive*100); ?>% 
+				</td>
+		<?php
+			}else{ ?>
+				<td width="60px" style="border:0px solid #000; padding: 5px; background-color: #f31e6d; color: #fff">
+					<?php echo round($active->num_rows()/$fullactive*100); ?>% 
+				</td>
+		<?php
+			}
+		?>
 		<?php
 			$query = $this->db->query('SELECT * FROM absen WHERE personID = '.$r['personID'].'');
 			foreach($query->result_array() as $r):
@@ -143,6 +163,9 @@
 			}
 		?> <!-- #41C4FF alt 'A' -->
 		</td>
+
+		
+
 		<?php
 			endforeach;
 		?>
@@ -153,3 +176,56 @@
 	?>
 	</div>
 </table>
+
+
+<!-- Modal -->
+		<div id="addAbsenModal" class="modal fade" role="dialog">
+		  <div class="modal-dialog">
+
+		    <!-- Modal content-->
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title">Tambah Data Absen <?php echo date('Y-m-d'); ?></h4>
+		      </div>
+		      <div class="modal-body">
+		      	<table class="table-striped">
+		      		<tr>
+		      			<th style="padding: 5px;">No</th>
+		      			<th style="padding: 5px;">Nama</th>
+		      			<th style="padding: 5px;">Alamat</th>
+		      			<th style="padding: 5px;">Absen</th>
+		      		</tr>
+		      		<?php
+					$query = $this->db->query('SELECT * FROM person WHERE pointID = '.$pointID.'');
+					$noo = 1;
+					foreach($query->result_array() as $r):
+					?>
+					<tr>
+						<td width="30px" style="border:0px solid #000; padding: 5px;"><?php echo $noo; ?></td>
+						<td width="150px" style="border:0px solid #000; padding: 5px;"><?php echo $r['personNAME']; ?></td>
+						<td width="150px" style="border:0px solid #000; padding: 5px;"><?php echo $r['personADDRESS']; ?></td>
+						<td width="70px" style="border:0px solid #000; padding: 5px;">
+							<select>
+								<option>H</option>
+								<option>I</option>
+								<option>S</option>
+								<option>A</option>
+							</select>
+						</td>
+					</tr>
+					<?php
+						$noo++;
+						endforeach;
+					?>
+		      	</table>
+		      </div>
+		      <div class="modal-footer">
+		      	<button id="" type="button" class="btn btn-default edit" data-dismiss="modal">Batal</button>
+		        <button id="" type="button" class="btn btn-default edit" data-dismiss="modal">Simpan</button>
+		      </div>
+		    </div>
+
+		  </div>
+		</div>
+		<!-- Close Modal -->

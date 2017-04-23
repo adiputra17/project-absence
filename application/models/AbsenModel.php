@@ -12,6 +12,11 @@ class AbsenModel extends ci_model{
         $this->db->query($sql);
     }
 
+    function deleteRegion($data){
+    	$sql = "DELETE FROM region WHERE regionID = ".$data."";
+    	$this->db->query($sql);
+    }
+
     function addPoint($data, $regionID){
 		$sql = "INSERT INTO point (pointNAME, regionID) VALUES ('".$data."', ".$regionID.")";
         $this->db->query($sql);
